@@ -1,0 +1,150 @@
+// Name: GASA Constellation Tour
+// Author: Nasser Mohammed circa 2025
+// Description: 3-minute planetarium show for the AstroTour Keynote Event
+
+// ---------------------
+// Pause / resume helpers
+// ---------------------
+function waitForAdvanceKey() {
+    var savedJ = core.getJDay();
+    var savedRate = core.getTimeRate();
+    core.setTimeRate(0);
+    var baseFloor = Math.floor(savedJ);
+    var curFloor = baseFloor;
+    while (curFloor == baseFloor) {
+        core.wait(0.25);
+        curFloor = Math.floor(core.getJDay());
+    }
+    core.setJDay(savedJ);
+    core.setTimeRate(savedRate);
+}
+
+function waitThenPauseKeyPrompt(sec) {
+    core.wait(sec);
+    LabelMgr.labelScreen("...", 100, 200, true, 20, "#ffffff");
+    core.wait(2);
+    LabelMgr.deleteAllLabels();
+    core.wait(1);
+    LabelMgr.labelScreen("...", 100, 200, true, 20, "#ffffff");
+    waitForAdvanceKey();
+    LabelMgr.deleteAllLabels();
+}
+
+// ---------------------
+// Setup
+// ---------------------
+core.setProjectionMode("ProjectionFisheye");
+core.clear("starchart");
+core.clear("deepspace");
+core.setGuiVisible(false);
+core.setTimeRate(0);
+StelSkyCultureMgr.setCurrentSkyCultureID("Modern");
+
+ConstellationMgr.setFlagLines(false);
+ConstellationMgr.setFlagLabels(false);
+ConstellationMgr.setFlagBoundaries(false);
+ConstellationMgr.setFlagArt(false);
+
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.setMountMode("horizon");
+StelMovementMgr.zoomTo(100, 10);
+core.wait(5);
+core.setTimeRate(600);
+core.wait(5);
+ConstellationMgr.setFlagLines(true);
+ConstellationMgr.setFlagLabels(true);
+core.wait(5);
+core.setTimeRate(0);
+core.wait(5);
+
+// ---------------------
+// Helper functions for camera / object movement
+// ---------------------
+function focusObj(name, fovDeg, flyTime) {
+    StelMovementMgr.setFlagTracking(false);
+    var ok = core.selectObjectByName(name, true);
+    if (!ok) {
+        core.output("Could not select: " + name);
+        return;
+    }
+    StelMovementMgr.setFlagTracking(true);
+    StelMovementMgr.zoomTo(fovDeg, flyTime);
+    core.wait(flyTime);
+}
+
+function panToObj(name, fovDeg, flyTime) {
+    StelMovementMgr.setFlagTracking(false);
+    StelMovementMgr.zoomTo(50, 2);
+    core.wait(2);
+    var ok = core.selectObjectByName(name, true);
+    if (!ok) {
+        core.output("Could not select: " + name);
+        return;
+    }
+    StelMovementMgr.setFlagTracking(true);
+    StelMovementMgr.zoomTo(fovDeg, flyTime);
+    core.wait(flyTime);
+}
+
+function rotateAroundTracked(seconds, timeRate) {
+    var prev = core.getTimeRate();
+    core.setTimeRate(timeRate);
+    core.wait(seconds);
+    core.setTimeRate(prev);
+}
+
+function showConstellation(constName) {
+    core.selectConstellationByName(constName);
+    StelMovementMgr.autoZoomIn(6);
+    core.wait(1);
+    StelMovementMgr.zoomTo(80, 8);
+    core.wait(1);
+    ConstellationMgr.setFlagArt(true);
+    core.wait(10);
+    ConstellationMgr.setFlagArt(false);
+}
+
+// ---------------------
+// Timeline with pauses
+// ---------------------
+StelMovementMgr.setMountMode("equatorial");
+showConstellation("Ursa Major");
+panToObj("Dubhe", 20, 5);
+core.wait(8);
+waitThenPauseKeyPrompt(1);
+
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.zoomTo(90, 5);
+core.wait(3);
+core.selectObjectByName("Polaris", true);
+StelMovementMgr.setFlagTracking(true);
+waitThenPauseKeyPrompt(1);
+StelSkyCultureMgr.setCurrentSkyCultureID("navajo");
+core.wait(12);
+StelMovementMgr.zoomTo(100, 5);
+rotateAroundTracked(10, 600);
+StelSkyCultureMgr.setCurrentSkyCultureID("Modern");
+StelMovementMgr.setMountMode("horizon");
+
+
+showConstellation("Orion");
+panToObj("Betelgeuse", 25, 5);
+core.wait(8);
+waitThenPauseKeyPrompt(1);
+
+showConstellation("Cassiopeia");
+panToObj("Schedar", 20, 5);
+core.wait(8);
+waitThenPauseKeyPrompt(1);
+
+showConstellation("Gemini");
+panToObj("Pollux", 25, 5);
+core.wait(8);
+waitThenPauseKeyPrompt(1);
+
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.setMountMode("horizon");
+StelMovementMgr.zoomTo(110, 3);
+core.wait(28);
+
+core.output("Ten-minute show complete.");
