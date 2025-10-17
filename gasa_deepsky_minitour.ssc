@@ -1,0 +1,87 @@
+// Name: GASA Deep Sky Mini Tour
+// Author: Codex for Nasser Mohammed (2025)
+// Description: Compact guided visit of M31, M57, and M51 inspired by the Binosky script flow.
+
+include("i18n.inc");
+
+function selectFirstAvailable(candidates) {
+    for (var i = 0; i < candidates.length; i++) {
+        if (core.selectObjectByName(candidates[i], true)) {
+            return candidates[i];
+        }
+    }
+    core.output("Selection failed for: " + candidates.join(", "));
+    return "";
+}
+
+var tourTargets = [
+    { names: ["M31", "NGC 224"], label: tr("Andromeda Galaxy (M31)"), detailFov: 3.2, dwell: 10 },
+    { names: ["M57", "NGC 6720"], label: tr("Ring Nebula (M57)"), detailFov: 0.8, dwell: 9 },
+    { names: ["M51", "NGC 5194"], label: tr("Whirlpool Galaxy (M51)"), detailFov: 2.4, dwell: 10 }
+];
+
+core.clear("starchart");
+core.clear("deepspace");
+core.clear("natural");
+LabelMgr.deleteAllLabels();
+core.setGuiVisible(false);
+core.setTimeRate(0);
+
+ConstellationMgr.setFlagLines(false);
+ConstellationMgr.setFlagLabels(false);
+ConstellationMgr.setFlagBoundaries(false);
+ConstellationMgr.setFlagArt(false);
+StarMgr.setFlagLabels(false);
+NebulaMgr.setFlagHints(true);
+
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.setMountMode("equatorial");
+StelMovementMgr.zoomTo(60, 0);
+core.wait(2);
+
+var titleLabel = LabelMgr.labelScreen(tr("Deep Sky Mini Tour"), 20, 20, false, 30, "#00AAFF");
+var countLabel = LabelMgr.labelScreen(tourTargets.length + " " + tr("objects"), 20, 60, false, 24, "#00AAFF");
+LabelMgr.setLabelShow(titleLabel, true);
+LabelMgr.setLabelShow(countLabel, true);
+core.wait(5);
+LabelMgr.deleteLabel(titleLabel);
+LabelMgr.deleteLabel(countLabel);
+
+for (var i = 0; i < tourTargets.length; i++) {
+    StelMovementMgr.setFlagTracking(false);
+    var entry = tourTargets[i];
+    var picked = selectFirstAvailable(entry.names);
+    if (picked == "") {
+        continue;
+    }
+
+    var labelId = LabelMgr.labelScreen(entry.label, 20, 120, false, 26, "#00AAFF");
+    LabelMgr.setLabelShow(labelId, true);
+
+    StelMovementMgr.autoZoomToSelectedObject(3);
+    core.wait(4);
+
+    StelMovementMgr.setFlagTracking(true);
+    StelMovementMgr.zoomTo(entry.detailFov, 4);
+    core.wait(entry.dwell);
+
+    LabelMgr.deleteLabel(labelId);
+
+    StelMovementMgr.setFlagTracking(false);
+    StelMovementMgr.zoomTo(40, 5);
+    core.wait(5);
+}
+
+var outro = LabelMgr.labelScreen(tr("Deep sky mini tour complete"), 20, 120, false, 26, "#00AAFF");
+LabelMgr.setLabelShow(outro, true);
+core.wait(6);
+LabelMgr.deleteLabel(outro);
+
+core.clear("natural");
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.zoomTo(60, 3);
+core.wait(3);
+core.goHome();
+
+core.setGuiVisible(true);
+core.output("Deep sky mini tour complete.");
