@@ -147,4 +147,6 @@ StelMovementMgr.setMountMode("horizon");
 StelMovementMgr.zoomTo(110, 3);
 core.wait(28);
 
-core.output("Ten-minute show complete.");
+waitThenPauseKeyPrompt(1);
+core.clear("natural");
+core.goHome();
