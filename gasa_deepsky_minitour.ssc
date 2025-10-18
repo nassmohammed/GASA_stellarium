@@ -31,7 +31,7 @@ core.setTimeRate(0);
 StelSkyCultureMgr.setCurrentSkyCultureID("Modern");
 
 // List of objects
-var objlist = ["M31", "M57", "M51"];
+var objlist = ["NGC869", "LMC", "M16", "M31", "M57", "M51"];
 
 core.clear("deepspace");
 NebulaMgr.setFlagHints(true);
