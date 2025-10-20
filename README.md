@@ -5,6 +5,8 @@ Download [here](https://stellarium.org/)
 
 This repository has the scripts used for the UofT GASA AstroTours planetarium show. 
 
+Outline for the planetarium guide is found in `guide_script.md`
+
 ## Script Installation
 
 After installing Stellarium, navigate to `/Users/{USER}/Library/Application Support/Stellarium/scripts` (create the scripts directory if it doesn't already exist) and copy the `.ssc` files into it.
